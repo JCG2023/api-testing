@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login</title>
+  <title>Dashboard</title>
   <style>
     body {
       font-family: Arial;
@@ -18,7 +18,7 @@
       background: white;
       padding: 30px;
       border-radius: 10px;
-      width: 320px;
+      width: 360px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
@@ -27,19 +27,20 @@
       margin-bottom: 20px;
     }
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+    .token-box {
+      background: #eef5ff;
+      border: 1px solid #cddfff;
+      padding: 15px;
       border-radius: 6px;
-      border: 1px solid #ccc;
+      word-break: break-all;
       font-size: 14px;
+      margin-bottom: 20px;
     }
 
     button {
       width: 100%;
       padding: 12px;
-      background: #007bff;
+      background: #dc3545;
       color: white;
       border: none;
       border-radius: 6px;
@@ -47,110 +48,37 @@
       cursor: pointer;
     }
 
-    button:disabled {
-      background: #9bbcf5;
-      cursor: not-allowed;
-    }
-
-    #result {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    .spinner {
-      display: none;
-      margin: 10px auto;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #007bff;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    button:hover {
+      background: #c82333;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>Login</h2>
+    <h2>Dashboard</h2>
 
-    <input id="username" type="text" placeholder="Username" />
-    <input id="password" type="password" placeholder="Password" />
+    <div id="tokenBox" class="token-box"></div>
 
-    <button id="loginBtn" onclick="login()">Login</button>
-
-    <div class="spinner" id="spinner"></div>
-
-    <div id="result"></div>
+    <button onclick="logout()">Logout</button>
   </div>
 
   <script>
-    async function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const resultBox = document.getElementById("result");
-      const spinner = document.getElementById("spinner");
-      const loginBtn = document.getElementById("loginBtn");
+    // Step 1: 檢查 token 是否存在
+    const token = localStorage.getItem("token");
 
-      // Reset UI
-      resultBox.style.display = "none";
-      resultBox.className = "";
-      spinner.style.display = "block";
-      loginBtn.disabled = true;
+    if (!token) {
+      // 沒 token → 自動跳回 login.html
+      window.location.href = "login.html";
+    }
 
-      try {
-        const response = await fetch(
-          "https://myapi-testing.netlify.app/.netlify/functions/login",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-          }
-        );
+    // Step 2: 顯示 token
+    document.getElementById("tokenBox").innerText = token;
 
-        const data = await response.json();
-
-        spinner.style.display = "none";
-        resultBox.style.display = "block";
-
-        if (response.status === 200) {
-          resultBox.classList.add("success");
-          resultBox.innerText = "Login successful! Token saved.";
-
-          // Save token
-          localStorage.setItem("token", data.token);
-        } else {
-          resultBox.classList.add("error");
-          resultBox.innerText = data.message || "Login failed";
-        }
-      } catch (err) {
-        spinner.style.display = "none";
-        resultBox.style.display = "block";
-        resultBox.classList.add("error");
-        resultBox.innerText = "Network error";
-      }
-
-      loginBtn.disabled = false;
+    // Step 3: Logout 功能
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
     }
   </script>
 
