@@ -3,4 +3,6 @@
   publish = "."
 
 [functions]
+  # 💡 這行非常關鍵！告訴 Netlify 去哪裡找你的 Python 程式碼
+  directory = "netlify/functions"
   included_files = ["netlify/functions/**"]
