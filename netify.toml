@@ -1,8 +1,16 @@
 [build]
-  command = "echo 'No build command needed'"
+  command = "pip install -r requirements.txt"
   publish = "."
 
 [functions]
-  # 💡 這行非常關鍵！告訴 Netlify 去哪裡找你的 Python 程式碼
   directory = "netlify/functions"
-  included_files = ["netlify/functions/**"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/hello"
+  to = "/.netlify/functions/api/hello"
+  status = 200
