@@ -3,81 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <title>Dashboard</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      width: 360px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .token-box {
-      background: #eef5ff;
-      border: 1px solid #cddfff;
-      padding: 15px;
-      border-radius: 6px;
-      word-break: break-all;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #c82333;
-    }
-  </style>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
 
-  <div class="container">
-    <h2>Dashboard</h2>
+  <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">
+      Dashboard
+    </h2>
 
-    <div id="tokenBox" class="token-box"></div>
+    <div class="space-y-4 mb-6">
+      <div>
+        <div class="text-xs font-semibold text-slate-500 uppercase">User</div>
+        <div id="username" class="text-lg font-medium text-slate-800">-</div>
+      </div>
 
-    <button onclick="logout()">Logout</button>
+      <div>
+        <div class="text-xs font-semibold text-slate-500 uppercase">Login Time</div>
+        <div id="loginTime" class="text-sm text-slate-700">-</div>
+      </div>
+
+      <div>
+        <div class="text-xs font-semibold text-slate-500 uppercase">Token</div>
+        <div id="token" class="text-xs text-slate-600 break-all bg-slate-50 border border-slate-200 rounded-md p-2">
+          -
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <button id="apiBtn"
+        class="w-full py-2.5 rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition disabled:bg-indigo-300"
+        onclick="callProtectedApi()">
+        Call Protected API
+      </button>
+      <div id="apiResult"
+        class="mt-3 text-sm rounded-md border border-slate-200 bg-slate-50 text-slate-700 p-3 hidden"></div>
+    </div>
+
+    <button
+      class="w-full py-2.5 rounded-md bg-rose-500 text-white font-medium hover:bg-rose-600 transition"
+      onclick="logout()">
+      Logout
+    </button>
   </div>
 
   <script>
-    // Step 1: 檢查 token 是否存在
+    // ✅ 檢查 token 是否存在
     const token = localStorage.getItem("token");
+    const username = localStorage.getItem("username");
+    const loginTime = localStorage.getItem("loginTime");
 
     if (!token) {
-      // 沒 token → 自動跳回 login.html
       window.location.href = "login.html";
     }
 
-    // Step 2: 顯示 token
-    document.getElementById("tokenBox").innerText = token;
+    // ✅ 顯示基本資訊
+    document.getElementById("token").innerText = token || "-";
+    document.getElementById("username").innerText = username || "Unknown";
 
-    // Step 3: Logout 功能
+    if (loginTime) {
+      const d = new Date(loginTime);
+      document.getElementById("loginTime").innerText = d.toLocaleString();
+    } else {
+      document.getElementById("loginTime").innerText = "-";
+    }
+
+    // ✅ 呼叫受保護 API
+    async function callProtectedApi() {
+      const apiBtn = document.getElementById("apiBtn");
+      const apiResult = document.getElementById("apiResult");
+
+      apiBtn.disabled = true;
+      apiBtn.innerText = "Loading...";
+      apiResult.classList.add("hidden");
+
+      try {
+        const res = await fetch(
+          "https://myapi-testing.netlify.app/.netlify/functions/profile",
+          {
+            headers: {
+              "Authorization": "Bearer " + token
+            }
+          }
+        );
+
+        const data = await res.json();
+        apiResult.classList.remove("hidden");
+
+        if (res.status === 200) {
+          apiResult.className =
+            "mt-3 text-sm rounded-md border border-emerald-200 bg-emerald-50 text-emerald-800 p-3";
+          apiResult.innerText = "Protected API OK:\n" + JSON.stringify(data, null, 2);
+        } else {
+          apiResult.className =
+            "mt-3 text-sm rounded-md border border-rose-200 bg-rose-50 text-rose-800 p-3";
+          apiResult.innerText = "Error:\n" + (data.message || "Unauthorized");
+        }
+      } catch (e) {
+        apiResult.classList.remove("hidden");
+        apiResult.className =
+          "mt-3 text-sm rounded-md border border-rose-200 bg-rose-50 text-rose-800 p-3";
+        apiResult.innerText = "Network error";
+      }
+
+      apiBtn.disabled = false;
+      apiBtn.innerText = "Call Protected API";
+    }
+
+    // ✅ Logout
     function logout() {
       localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("loginTime");
       window.location.href = "login.html";
     }
   </script>
