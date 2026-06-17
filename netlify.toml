@@ -1,2 +1,17 @@
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/data"
+  to = "/.netlify/functions/data"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/.netlify/functions/login"
+  status = 200
+
+[[redirects]]
+  from = "/test"
+  to = "/.netlify/functions/test"
+  status = 200
