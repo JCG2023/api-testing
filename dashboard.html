@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 360px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .token-box {
+      background: #eef5ff;
+      border: 1px solid #cddfff;
+      padding: 15px;
+      border-radius: 6px;
+      word-break: break-all;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Dashboard</h2>
+
+    <div id="tokenBox" class="token-box"></div>
+
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    // Step 1: 檢查 token 是否存在
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      // 沒 token → 自動跳回 login.html
+      window.location.href = "login.html";
+    }
+
+    // Step 2: 顯示 token
+    document.getElementById("tokenBox").innerText = token;
+
+    // Step 3: Logout 功能
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    }
+  </script>
+
+</body>
+</html>
